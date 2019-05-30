@@ -1,0 +1,48 @@
+RUBIN	full.name	is.littoral	is.filterfeeder	is.omnivore	is.carnivore	L.min	L.max	author	family
+diap.brac	Diaphanosoma brachyurum	0	1	0	0	0.65	1.30	(Liév.)T	Sididae
+limn.fron	Limnosida frontosa	0	1	0	0	0.98	2.00	Sars	Sididae
+sida.crys	Sida crystallina	1	1	0	0	1.80	4.00	(O.F.M.)	Sididae
+holo.gibb	Holopedium gibberum	0	1	0	0	1.00	2.50	Zaddach	Holopediidae
+ceri.pulc	Ceriodaphnia pulchella	0	1	0	0	0.40	0.86	Sars	Daphniidae
+ceri.quad	Ceriodaphnia quadrangula	0	1	0	0	0.40	1.20	(O.F.M.)	Daphniidae
+daph.cris	Daphnia cristata	0	1	0	0	0.90	1.80	Sars	Daphniidae
+daph.cucu	Daphnia cucullata	0	1	0	0	0.63	1.70	Sars	Daphniidae
+daph.gale	Daphnia galeata	0	1	0	0	0.75	2.90	Sars	Daphniidae
+daph.lonr	Daphnia longiremis	0	1	0	0	0.50	1.60	Sars	Daphniidae
+daph.lons	Daphnia longispina	0	1	0	0	0.93	2.30	(O.F.M.)	Daphniidae
+scap.mucr	Scapholeberis mucronata	1	1	0	0	0.60	1.40	(O.F.M.)	Daphniidae
+bosm.core	Bosmina coregoni	0	1	0	0	0.50	1.50	(Baird)	Bosminidae
+bosm.lonr	Bosmina longirostris	0	1	0	0	0.23	0.70	(O.F.M.)	Bosminidae
+bosm.lons	Bosmina longispina	0	1	0	0	0.40	1.20	Leydig	Bosminidae
+alon.inte	Alona intermedia	1	1	0	0	0.30	0.50		Chydoridae
+alon.exci	Alonella excisa	1	1	0	0	0.30	0.50	(Fischer)	Chydoridae
+alon.nana	Alonella nana	1	1	0	0	0.20	0.30	Baird	Chydoridae
+alon.elon	Alonopsis elongata	1	1	0	0	1.00	1.00	Sars	Chydoridae
+chyd.pige	Chydorus piger	1	1	0	0	0.30	0.50		Chydoridae
+chyd.spha	Chydorus sphaericus	0	1	0	0	0.33	0.49	(O.F.M.)	Chydoridae
+pleu.trig	Pleuroxus trigonellus	1	1	0	0	0.50	0.70		Chydoridae
+poly.pedi	Polyphemus pediculus	0	0	0	1	0.76	1.80	(Leuck.)	Polyphemidae
+byth.long	Bythotrephes longimanus	0	0	0	1	2.50	4.00	Leydig	Cercopagididae
+lept.kind	Leptodora kindti	0	0	0	1	5.50	18.00	Focke	Leptodoridae
+limn.macr	Limnocalanus macrurus	0	1	0	0	2.50	2.90	Sars	Centropagidae
+acan.dent	Acanthodiaptomus denticornis	0	1	0	0	1.50	3.00	(Wierz.)	Diaptomidae
+eudi.ilis	Eudiaptomus gracilis	0	1	0	0	1.10	1.70	Sars	Diaptomidae
+eudi.ides	Eudiaptomus graciloides	0	1	0	0	1.04	1.50	(Lillj.)	Diaptomidae
+arct.lati	Arctodiaptomus laticeps	0	1	0	0	1.20	1.90	(Sars)	Diaptomidae
+mixo.laci	Mixodiaptomus laciniatus	0	1	0	0	1.00	1.60	(Lillj.)	Diaptomidae
+eury.lacu	Eurytemora lacustris	0	1	0	0	1.10	1.50	(POPPE)	Temoridae
+hete.appe	Heterocope appendiculata	0	0	0	1	2.00	2.20	Sars	Temoridae
+hete.sali	Heterocope saliens	0	0	0	1	2.50	3.20	(Lillj.)	Temoridae
+macr.albi	Macrocyclops albidus	1	0	1	0	1.70	2.50	(Jur.)	Cyclopidae
+eucy.serr	Eucyclops serrulatus	1	0	1	0	0.80	1.50	(Fisch.)	Cyclopidae
+cycl.abys	Cyclops abyssorum	0	0	1	0	1.50	1.90		Cyclopidae
+cycl.boha	Cyclops bohater	0	0	1	0	2.10	2.60		Cyclopidae
+cycl.lacu	Cyclops lacustris	0	0	1	0	1.50	2.00		Cyclopidae
+cycl.scut	Cyclops scutifer	0	0	1	0	1.10	1.60	Sars	Cyclopidae
+cycl.vici	Cyclops vicinus	0	0	1	0	1.30	2.30	Uljanin	Cyclopidae
+mega.giga	Megacyclops gigas	1	0	1	0	2.00	3.50	(Claus)	Cyclopidae
+mega.viri	Megacyclops viridis	1	0	1	0	1.20	2.10	(Jur.)	Cyclopidae
+diac.bicu	Diacyclops bicuspidatus	1	0	1	0	0.90	1.40	(Sars)	Cyclopidae
+meso.leuc	Mesocyclops leuckarti	0	0	1	0	0.90	1.30	(Claus)	Cyclopidae
+ther.cras	Thermocyclops crassus	0	0	1	0	0.77	0.97	(Fisch.)	Cyclopidae
+ther.oith	Thermocyclops oithonoides	0	0	1	0	0.80	1.00	(Sars)	Cyclopidae

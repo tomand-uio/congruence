@@ -1,0 +1,32 @@
+	db	query	family	species	RUBIN
+1	itis	Salmo trutta	Salmonidae	Salmo.trutta	salm.trut
+2	itis	Salmo salar	Salmonidae	Salmo.salar	salm.sala
+3	itis	Salvelinus alpinus	Salmonidae	Salvelinus.alpinus	salv.alpi
+4	itis	Coregonus lavaretus	Salmonidae	Coregonus.lavaretus	core.lava
+5	itis	Thymallus thymallus	Salmonidae	Thymallus.thymallus	thym.thym
+6	itis	Esox lucius	Esocidae	Esox.lucius	esox.luci
+7	itis	Perca fluviatilis	Percidae	Perca.fluviatilis	perc.fluv
+8	itis	Gymnocephalus cernuus	Percidae	Gymnocephalus.cernuus	gymn.cern
+9	itis	Sander lucioperca	Percidae	Sander.lucioperca	sand.luci
+10	itis	Phoxinus phoxinus	Cyprinidae	Phoxinus.phoxinus	phox.phox
+11	itis	Gasterosteidae	Gasterosteidae	Gasterosteidae	gast.spp.
+12	itis	Anguilla anguilla	Anguillidae	Anguilla.anguilla	angu.angu
+13	itis	Lota lota	Gadidae	Lota.lota	lota.lota
+14	itis	Alburnus alburnus	Cyprinidae	Alburnus.alburnus	albu.albu
+15	itis	Rutilus rutilus	Cyprinidae	Rutilus.rutilus	ruti.ruti
+16	itis	Leuciscus idus	Cyprinidae	Leuciscus.idus	leuc.idus
+17	itis	Leuciscus leuciscus	Cyprinidae	Leuciscus.leuciscus	leuc.leuc
+18	itis	Abramis brama	Cyprinidae	Abramis.brama	abra.bram
+19	itis	Leuciscus cephalus	Cyprinidae	Leuciscus.cephalus	leuc.ceph
+20	itis	Blicca bjoerkna	Cyprinidae	Blicca.bjoerkna	blic.bjoe
+21	itis	Scardinius erythrophthalmus	Cyprinidae	Scardinius.erythrophthalmus	scar.eryt
+22	itis	Osmerus eperlanus	Osmeridae	Osmerus.eperlanus	osme.eper
+23	itis	Coregonus albula	Salmonidae	Coregonus.albula	core.albu
+24	itis	Myoxocephalus quadricornis	Cottidae	Myoxocephalus.quadricornis	myox.quad
+25	itis	Tinca tinca	Cyprinidae	Tinca.tinca	tinc.tinc
+26	itis	Cyprinus carpio	Cyprinidae	Cyprinus.carpio	cypr.carp
+27	itis	Carassius carassius	Cyprinidae	Carassius.carassius	cara.cara
+28	itis	Lampetra fluviatilis	Petromyzontidae	Lampetra.fluviatilis	lamp.fluv
+29	itis	Lampetra planeri	Petromyzontidae	Lampetra.planeri	lamp.plan
+30	itis	Cottus gobio	Cottidae	Cottus.gobio	cott.gobi
+31	itis	Cottus poecilopus	Cottidae	Cottus.poecilopus	cott.poec

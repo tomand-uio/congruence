@@ -1,0 +1,167 @@
+---
+title: "Suppl. 3 ordinations"
+author: "Tom Andersen"
+date: "2 april 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r message=FALSE, warning=FALSE}
+library(vegan)
+```
+
+Load data sets for environment (`env`), phytoplankton (`phyto`), zooplankton (`zoo`), and fish (`fish`), all extracted from text files located in the `/data` folder
+
+```{r}
+
+source("data.0 env.R")
+source("data.1 phyto.R")
+source("data.2 zoo.R")
+source("data.3 fish.R")
+
+```
+
+## Phytoplankton ordination
+
+Phytoplankton data consists of relative biovolumes of 208 taxa present in >3 of the 73 lakes. The NMDS ordination on square-root transformed relative biovolumes converged in <100 iteration with stress = 0.20. Ordinations with all 395 taxa or on just the 92 identified genera were very similar (data not shown)
+
+```{r message=FALSE, warning=FALSE}
+
+phyto.freq <- colSums(phyto > 0)
+phyto.rich <- rowSums(phyto > 0)
+
+mds.phyto <- metaMDS(sqrt(phyto), trymax = 200, trace=0) 
+phyto.fit <- envfit(mds.phyto, env[, c(4:6, 10, 12, 13)])
+
+```
+
+```{r echo=FALSE}
+
+d <- with(phyto.fit[[1]], data.frame(arrows, r, pvals))
+names(d)  <- c("NMDS1", "NMDS2", "R2", "Pr(>R)")
+knitr::kable(d, digits=3, caption="Table S3.1. Environmental variables fitted to phytoplankton NMDS scores, with p-values based on 999 permutations")
+
+```
+
+```{r echo=FALSE, fig.dim = c(7, 7), fig.cap="Figure S3.1. Site scores in phytoplankton NMDS ordination scaled by species richness, and overlaid fitted environmental variable vectors"}
+
+phyto.fig <- ordiplot(mds.phyto, type = "n", main="Phytoplankton richness by site")
+points(phyto.fig, "sites", pch=19, col=gray(0.5, 0.5), cex=(phyto.rich / 30))
+plot(phyto.fit, col=gray(0.3, 0.7), lwd=2.5, add=TRUE)
+legend("bottomright", paste(c(30, 60, 90), "species"), cex=0.8, 
+       pch=19, col=gray(0.5, 0.5), pt.cex=1:3, bty="n")
+
+```
+
+```{r echo=FALSE, fig.dim = c(7, 7), fig.cap="Figure S3.2. Phytoplankton NMDS species loadings scaled by species occurrence frequency, and overlaid fitted environmental variable vectors"}
+
+phyto.fig <- ordiplot(mds.phyto, type = "n", main="Phytoplankton classes")
+points(phyto.fig, "species", pch=19, col=phyto.col[phyto.class], 
+       cex=sqrt(phyto.freq / 10))
+plot(phyto.fit, col=gray(0.3, 0.7), lwd=2.5, add=TRUE)
+legend("bottomleft", levels(phyto.class), cex=0.8, 
+       pch=19, pt.cex=1.5, col=phyto.col, bty="n")
+legend("bottomright", paste(c(5, 25, 50, 75), "sites"), cex=0.8, 
+       pch=19, col="gray", pt.cex=sqrt(c(5, 25, 50, 75) / 10), bty="n")
+
+```
+
+Due to the larger number of taxa, the phytoplankton ordination (Figure S3.2) is only resolved to class level. Along the longitude / TOC vector there is a distinct taxon sorting with high loadings of the major Cryptophyceae taxa in the western, clear-water lakes and high loadings of diatom taxa (Bacillariophyceae) in the eastern, brown-water end of the gradient. Similarly, there is a tendency for Chrysophyceae dominance in the higher altitude / latitude lakes with increasing cyanobacteria loadings towards the higher productivity (TP / COND) end of the gradient.
+
+## Zooplankton ordination
+
+NMDS ordinations using zooplankton abundance or presence/absence, on the full species inventory or the common ones encountered in the subsample, were all very similar (Procrustes correlations = 0.75 to 0.99, all with p = 0.001 based on 999 permutations). Based on the general similarity between zooplankton ordinations for different subsets, we chose to base the following analysis on relative abundances of the species encountered in the subsample.
+
+Zooplankton data consists of relative abundances of 34 pelagic crustacean taxa encountered in the 73 lakes. NMDS ordinations converged in <100 iterations with stress = 0.19. Ordinations that also included littoral or rare species were very similar (data not shown)
+
+```{r message=FALSE, warning=FALSE}
+
+zoo.freq <- colSums(zoo > 0)
+zoo.rich <- rowSums(zoo > 0)
+
+mds.zoo <- metaMDS(zoo, trymax=200, trace=0)
+zoo.fit <- envfit(mds.zoo, env[, c(4:6, 10, 12, 13)])
+
+```
+
+```{r echo=FALSE}
+
+d <- with(zoo.fit[[1]], data.frame(arrows, r, pvals))
+names(d)  <- c("NMDS1", "NMDS2", "R2", "Pr(>R)")
+knitr::kable(d, digits=3, caption="Table S3.2. Environmental variables fitted to zooplankton NMDS scores, with p-values based on 999 permutations")
+
+```
+
+```{r echo=FALSE, fig.dim = c(7, 7), fig.cap="Figure S3.3. Site scores in zooplankton NMDS ordination scaled by species richness, and overlaid fitted environmental variable vectors"}
+
+zoo.fig <- ordiplot(mds.zoo, type = "n", main="Zooplankton richness by site")
+points(zoo.fig, "sites", pch=19, col=gray(0.5, 0.5), cex=(zoo.rich / 5))
+plot(zoo.fit, col=gray(0.3, 0.7), lwd=2.5, add=TRUE)
+legend("bottomleft", paste(c(5, 10, 15, 20), "species"), cex=0.8, 
+       pch=19, col=gray(0.5, 0.5), pt.cex=1:4, bty="n")
+
+```
+
+```{r echo=FALSE, fig.dim = c(7, 7), fig.cap="Figure S3.4. Zooplankton NMDS species loadings scaled by species occurrence frequency, and overlaid fitted environmental variable vectors"}
+
+zoo.fig <- ordiplot(mds.zoo, type = "n", main="Zooplankton species")
+points(zoo.fig, "species", pch=19, col=zoo.col[zoo.fam], cex=sqrt(zoo.freq / 10))
+plot(zoo.fit, col=gray(0.3, 0.7), lwd=2.5, add=TRUE)
+text(zoo.fig, "species", cex=0.6, col=rgb(0, 0, 1, 0.5))
+legend("bottomleft", levels(zoo.fam), cex=0.8, pch=19, pt.cex=1.5, col=zoo.col, bty="n")
+legend("bottomright", paste(c(5, 25, 50, 75), "sites"), cex=0.8, 
+       pch=19, col="gray", pt.cex=sqrt(c(5, 25, 50, 75) / 10), bty="n")
+
+```
+
+The zooplankton ordination (Fig. S4) shows high loadings for especially large-bodied calanoid copepods (Arctodiaptomus laticeps, Mixodiaptomus laciniatus, Heterocope saliens, Acanthodiaptomus denticornis) and cladocerans (Daphnia galeata, Bythotrephes longimanus) in the western part of the LON / TOC gradient. Along the productivity gradient there are distinct species replacements in the cladoceran genera Bosmina and Daphnia, with B. longispina and D. cristata being replaced by B. longirostris / coregoni and D. longispina / cucullata with decreasing altitude / latitude and increasing TP / COND. Two small and relatively rare cyclopoid copepods (Cyclops bohater and Thermocyclops crassus) are only found in the eastern-most lakes. 
+
+## Fish ordination
+
+Fish data consists of presence/absence of the 31 fish species registered in the 73 lakes. NMDS ordinations converged in <10 iterations with stress = 0.14. 
+
+```{r message=FALSE, warning=FALSE}
+
+fish.freq <- colSums(fish > 0)
+fish.rich <- rowSums(fish > 0)
+
+mds.fish <- metaMDS(fish, k=2, trymax=200, trace=0)
+fish.fit <- envfit(mds.fish, env[, c(4:6, 10, 12, 13)])
+
+```
+
+```{r echo=FALSE}
+
+d <- with(fish.fit[[1]], data.frame(arrows, r, pvals))
+names(d)  <- c("NMDS1", "NMDS2", "R2", "Pr(>R)")
+knitr::kable(d, digits=3, caption="Table S3.3. Environmental variables fitted to fish NMDS scores, with p-values based on 999 permutations")
+
+```
+
+```{r echo=FALSE, fig.dim = c(7, 7), fig.cap="Figure S3.5. Site scores in fish NMDS ordination scaled by species richness, and overlaid fitted environmental variable vectors"}
+
+fish.fig <- ordiplot(mds.fish, type = "n", main="Fish richness by site", 
+                     xlim=c(-1.5, 1.5), ylim=c(-1.2, 1.2))
+points(fish.fig, "sites", pch=19, col=gray(0.5, 0.5), cex=(fish.rich / 5))
+plot(fish.fit, col=gray(0.3, 0.7), lwd=2.5, add=TRUE)
+legend("bottomright", paste(c(5, 10, 15, 20), "species"), 
+       cex=0.8, pch=19, col=gray(0.5, 0.5), pt.cex=1:4, bty="n")
+
+```
+
+```{r echo=FALSE, fig.dim = c(7, 7), fig.cap="Figure S3.6. Fish NMDS species loadings scaled by species occurrence frequency, and overlaid fitted environmental variable vectors"}
+
+fish.fig <- ordiplot(mds.fish, type = "n", main="Fish species")
+points(fish.fig, "species", pch=19, col=fish.col[fish.fam], cex=sqrt(fish.freq / 10))
+plot(fish.fit, col=gray(0.3, 0.7), lwd=2.5, add=TRUE)
+text(fish.fig, "species", cex=0.6, col=rgb(0, 0, 1, 0.5))
+legend("topleft", levels(fish.fam), cex=0.8, pch=19, pt.cex=1.5, col=fish.col, bty="n")
+legend("topright", paste(c(5, 25, 50, 75), "sites"), cex=0.8, 
+	pch=19, col="gray", pt.cex=sqrt(c(5, 25, 50, 75) / 10), bty="n")
+
+```
+
+The fish community ordination (Fig. S5) shows a clear separation between the ocean-side invaders (salmonids (Salmo trutta / salar and Salvelinus alpinus), sticklebacks (Gastrosteida), and European eel (Anguilla anguilla)) and the remainder of the fish species, especially cyprinids and percids, which are thought to have followed post-glacial invasion paths through the freshwater phases of the Baltic Sea. Notable exceptions to this pattern are carp (Cyprinus carpio) and minnow (Phoxinus phoxinus) which are expected to have been widely spread by humans. A number of cyprinids, such as silver and common bream (Blicca bjoerkna and Abramis brama), tench (Tinca tinca), and rudd (Scardinius erythropthalmus) have high loadings in the low latitude / altitude, high TP / COND lakes.

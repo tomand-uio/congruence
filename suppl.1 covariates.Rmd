@@ -1,0 +1,207 @@
+---
+title: "Supplementary information 1: Selection of covariates"
+author: "Tom Andersen"
+date: "13 februar 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#### Study design is reflected in choice of explanatory variables
+
+The selected lakes were spread out along an W-E longitudinal transect from Western Norway to Eastern Sweden. Using existing monitoring data (REBECCA data base), they were selected to have lake water concentrations of total organic carbon (TOC) and total phosphorus (TP) as uncorrelated as possible to each other, and also to longitudinal position. The lakes were also constrained by latitude (58N - 62N), altitude (< 600m), and surface area (>1 km2), as well as keeping TOC < 30 mg/L, TP < 30 µg/L, and pH > 6. 
+Logitude, TOC, and TP are thus the 3 main design variables of this study. Despite the spatial constraints on latitude and altitude, there was still unavoidable variation along these dimensions. To control for this, we included latitude and altitude among the main covariates. Finally, we included conductivity as a 6th covariate, as an indicator of soil depth and landscape productivity which is less sensitive to local pollution than  total phosphorus.
+The set of available environmental data is assembled from various sources, including maps and other georeferenced data (altitude, position, climate), field measurements from the sampling (Secchi depth, CTD casts), as well as chemical analyses on collected water samples
+
+```{r, message=FALSE, warning=FALSE}
+library(car)
+library(raster)
+library(vegan)
+```
+
+
+#### Climatic indicators: Mean temperatures from Worldclim
+
+We start with extracting lake coordinates from the file "COMSAT 2011 lakes.txt" and use the lake coordinates to extract mean temperature data for each lake from the worldclim data base <http://www.worldclim.org/> using the [raster package](https://cran.r-project.org/web/packages/raster/index.html)
+
+```{r}
+lake <- read.table("data/COMSAT 2011 lakes.txt", header=TRUE, sep="\t")
+
+WGS84 <- CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs")
+lake.sp <- SpatialPointsDataFrame(lake[, c("Longitude", "Latitude")], lake, proj4string = WGS84)
+
+tmean <- getData('worldclim', var='tmean', res=2.5)
+```
+
+The data are mean monthly temperatures over the period 1960 to 1990. We can for example look at the July temperature raster with sampling locations overlaid (notice that units are 10 * degrees C):
+
+```{r, echo=FALSE, fig.align="center", fig.cap="Fig. S1.1 Mean July temperature (x 10) with sampled lake locations indicated"}
+
+scand <- as(extent(4.5, 19.5, 57, 64), 'SpatialPolygons')
+crs(scand) <- crs(tmean)
+tmean.scand <- crop(tmean, scand) # Crop to S. Scandinavia
+
+plot(tmean.scand[[7]])
+points(coordinates(lake.sp))
+```
+
+We then use the raster-function `extract()` to interpolate mean monthly temperatures for each lake. From this we compute annual mean temperature and add this and the mean July temperature (since this was the time of sampling) to the `data.frame` with specific lake information.
+
+```{r}
+tmean.lake <- extract(tmean.scand, coordinates(lake.sp))
+tmean.lake <- as.data.frame(tmean.lake / 10) # degrees Celsius
+
+lake$Tmean <- rowMeans(tmean.lake)
+lake$Tjuly <- tmean.lake[, "tmean7"]
+```
+
+We then load some other files containing in situ measurements, including CTD cast averages over 0 - 5 meter (same interval as integrated chemistry samples), as well as some water chemistry measurements:
+
+```{r}
+field <- read.table("data/COMSAT 2011 field.data.txt", header=TRUE)
+ctd <- read.table("data/COMSAT 2011 CTD.txt", header=TRUE, sep="\t")
+chem <- read.table("data/COMSAT 2011 chemistry.txt", header=TRUE)
+```
+
+#### Merge spatial data with other variables
+
+Since all 4 tables have a column `ID` with unique lake identifiers, and no other column names in common we can easily merge the columns we need into one common data frame:
+
+```{r}
+env <- lake[, c("ID", "Lake", "Date", "Latitude", "Longitude", "Altitude", "Area.km2", "Tmean", "Tjuly")]
+env <- merge(env, field[, c("ID", "Secchi.depth")])
+env <- merge(env, ctd[, c("ID", "Temp", "Chla")])
+env <- merge(env, chem[, c( "ID", "Cond", "pH", "TOC", "TN", "TP", "SiO2")])
+```
+
+We inadvertently ended up including one glacier-influenced lake with temperature < 10C, one acid lake with pH < 6, and two very eutrophic lakes with pH > 10 among our sampling locations. In order to reduce sensitivity to the these extreme lakes, we chose to filter them out:
+
+```{r}
+env <- subset(env, (Temp > 10) & (pH > 6) & (pH < 8))
+```
+
+The resulting table has 73 observations on 15 spatial, climatic and environmental indicators with the following summey statistics:
+
+```{r, echo=FALSE}
+env$SiO2 <- env$SiO2 / 1000 # mg / L
+
+q <- rbind(
+  apply(env[, 4:18], 2, min),
+  apply(env[, 4:18], 2, quantile, p=0.25),
+  apply(env[, 4:18], 2, quantile, p=0.50),
+  apply(env[, 4:18], 2, quantile, p=0.75),
+  apply(env[, 4:18], 2, max)
+)
+
+q <- as.data.frame(t(q))
+names(q) <- c("Min", "Q1", "Q2", "Q3", "Max")
+q$Legend <- c("Latitude", "Longitude", "Altitude (m)", "Surface area (km2)",
+            "Annual mean temperature (C, Worldclim)", "Mean July temperature (C, Worldclim)",
+            "Secchi depth (m)", "Water temperature (C, CTD)", "Chlorophyll (in vivo, CTD)",
+            "Specific conductivity (mS/m)", "pH", "Total organic C (mg/L)", "Total N (mg/L)",
+            "Total P (µg/L)", "Silicate (mg/L")
+
+knitr::kable(q, digits=2, caption="Table S1.1. Summary statistics of 15 relevant spatial, climatic, and environmental covariates (1st, 2nd (= median), 3rd quartiles, and maxima)")
+```
+
+Some of these variables a noticably right-skewed. We therefore choose to log-transform Secchi depth, surface area, and all the water chemistry variables except pH:
+
+```{r}
+env[, c(7, 10, 12:13, 15:18)] <- log(env[, c(7, 10, 12:13, 15:18)])
+names(env) <- c("ID", "Lake", "Date", "Latitude", "Longitude", "Altitude", "log.Area",
+                "Tmean", "Tjuly", "log.Secchi", "Twater", "log.Chla", "log.Cond",
+                "pH", "log.TOC", "log.TN", "log.TP", "log.SiO2")
+```
+
+We can consider two groups of main variables: indicators of spatial position (Latitude, Longitude, Altitude), and indicators of local environmental conditions (log(Cond), log(TOC), log(TP)).
+
+```{r}
+main.vars <- c("Latitude", "Longitude", "Altitude", "log.Cond", "log.TOC", "log.TP")
+aux.vars <- c("log.Area", "Tmean", "Tjuly", "log.Secchi", "Twater", "log.Chla", "pH", "log.TN", "log.SiO2")
+sp.vars <- c("Latitude", "Longitude", "Altitude", "log.Area", "Tmean", "Tjuly", "Twater")
+loc.vars <- c("log.Cond", "log.TOC", "log.TP", "log.Secchi", "log.Chla", "pH", "log.TN", "log.SiO2")
+```
+
+#### Relations between main covariates of the study design and other explanatory variables
+
+```{r, echo=FALSE, fig.align="center", fig.height=6, fig.width=6, fig.cap="Fig. S1.2 Scatter plot matrix of the 6 main covariates used in this study, with marginal distributions on the diagonal, Pearson correlation coefficient in lower triangle, and LOESS smoothers indicated by red lines"}
+
+# Panel functions modified from pairs() help file
+
+panel.cor <- function(x, y, ...){
+  usr <- par("usr"); on.exit(par(usr))
+  par(usr = c(0, 1, 0, 1))
+  r <- as.numeric(cor.test(x, y)$estimate)
+  text(0.5, 0.5, sprintf("%.2f", r), cex=1.6)
+}
+
+panel.hist <- function(x, ...) {
+  usr <- par("usr"); on.exit(par(usr))
+  par(usr = c(usr[1:2], 0, 1.5))
+  h <- hist(x, breaks=10, plot = FALSE)
+  x <- h$breaks
+  y <- h$counts / max(h$counts)
+  rect(x[-length(x)], 0, x[-1], y, border=NA, col="gray")
+}  
+
+pairs(env[, main.vars], upper.panel=panel.smooth, pch=19, col="gray",
+      diag.panel=panel.hist, lower.panel=panel.cor)
+
+```
+
+As we can see from the scatter plot matrix above, some of these variables are significantly correlated, especially log(TOC) with longitude (r = 0.65) and log(TP) (r = 0.57). But none of the covariates have variance inflation factors VIF > 3:
+
+```{r, echo=FALSE}
+
+# Variance inflation  factors (VIFs) are essentially the same for any linear model 
+# using the same predictors, so we just fit a random, standard normal as response
+# (inspired by http://highstat.com/Books/BGS/GAMM/RCodeP2/HighstatLibV6.R)
+
+dummy <- rnorm(nrow(env))
+VIF <- vif(lm(dummy ~ ., data=env[, main.vars]))
+knitr::kable(t(VIF), digits=1, 
+             caption="Table S1.2. Variance inflation factors for the 6 main covariates")
+```
+
+
+```{r, echo=FALSE, fig.align="center", fig.height=7, fig.width=7, fig.cap="Fig. S1.3 Scatter plot matrix of the 3 spatial indicators together with other geographical and climatic indicators (marginal distributions on the diagonal, Pearson correlation coefficient in lower triangle, and LOESS smoothers indicated by red lines)"}
+pairs(env[, sp.vars], upper.panel=panel.smooth, pch=19, col="gray", 
+      diag.panel=panel.hist, lower.panel=panel.cor)
+```
+
+Mean annual air temperature is, as expected, negatively related to both Latitude (r = -0.54) and especially Altitude (r = -0.91). Mean July air temperature is more strongly related to Longitude (r = 0.67), reflecting that an West - East transect in this region is also an oceanicity - continentality gradient. Measured water temperature at the sampling is more strongly correlated with mean July air temperature (r = 0.77) than with annual mean temperature (r = 0.36)
+
+```{r, echo=FALSE, fig.align="center", fig.height=7, fig.width=7, fig.cap="Fig. S1.4 Scatter plot matrix of the 3 local environment indicators together with other water chemistry measurements (marginal distributions on the diagonal, Pearson correlation coefficient in lower triangle, and LOESS smoothers indicated by red lines)"}
+pairs(env[, loc.vars], upper.panel=panel.smooth, pch=19, col="gray", 
+      diag.panel=panel.hist, lower.panel=panel.cor)
+```
+
+Conductivity (log(Cond)) is strongly positively related to pH and Total N (log(TN); r = 0.80 for both). As such,we can say that log(Cond) also serves as a proxy for pH which was used as a constraint in the lake selection procedure, but which still varied between 6 and 8 in the final data set. Water transparency (log(Secchi)) is, as expected, negatively related to both water color (log(TOC); r = -0.65),  algal biomass (log(Chl); r = -0.68), and total P (log(TP); r = -0.72), while chlorophyll and total P are positively related (r = 0.63)
+
+#### PCA of main and auxiliary covariates
+
+We can illustrate the relationships between the main covariates and other variables as a principal components ordination with passive variables. We first use the rda() function of the vegan package to do an unconstrained ordination of the main variables:
+
+```{r}
+env.z <- as.data.frame(scale(env[, -(1:3)]))
+rownames(env.z) <-  env$ID
+
+pca <- rda(env.z[, main.vars])
+(efit <- envfit(pca, env.z[, aux.vars]))
+```
+
+In other words, all covariates except log(area) are significantly correlated with the PC ordination axes defined by the 6 main variables:
+
+```{r, echo=FALSE, fig.align="center", fig.height=6, fig.width=6, fig.cap="Fig. S1.5 Biplot of a principal component ordination of the 6 main covariates (red arrows), with additional, passively fitted environmental and climatic indicators overlaid as blue arrows and sites as gray dots"}
+plot(PC2 ~ PC1, data=scores(pca)$sites, pch=19, col="gray", xlim=c(-2,2), ylim=c(-2,2))
+
+with(as.data.frame(scores(pca)$species), {
+  arrows(0 * PC1, 0 * PC2, PC1, PC2, length=0.1, col="red")
+  text(1.1 * PC1, 1.1 * PC2, main.vars, cex=0.8, col="red")
+}) 
+
+plot(efit, cex=0.8)
+```
+
