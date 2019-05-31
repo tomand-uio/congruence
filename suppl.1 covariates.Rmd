@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 #### Study design is reflected in choice of explanatory variables
 
-The selected lakes were spread out along an W-E longitudinal transect from Western Norway to Eastern Sweden. Using existing monitoring data (REBECCA data base), they were selected to have lake water concentrations of total organic carbon (TOC) and total phosphorus (TP) as uncorrelated as possible to each other, and also to longitudinal position. The lakes were also constrained by latitude (58N - 62N), altitude (< 600m), and surface area (>1 km2), as well as keeping TOC < 30 mg/L, TP < 30 µg/L, and pH > 6. 
+The selected lakes were spread out along an W-E longitudinal transect from Western Norway to Eastern Sweden. Using existing monitoring data (REBECCA data base), they were selected to have lake water concentrations of total organic carbon (TOC) and total phosphorus (TP) as uncorrelated as possible to each other, and also to longitudinal position. The lakes were also constrained by latitude (58&deg;N - 62&deg;N), altitude (< 600m), and surface area (>1 km2), as well as keeping TOC < 30 mg/L, TP < 30 $\mu$g/L, and pH > 6. 
 Logitude, TOC, and TP are thus the 3 main design variables of this study. Despite the spatial constraints on latitude and altitude, there was still unavoidable variation along these dimensions. To control for this, we included latitude and altitude among the main covariates. Finally, we included conductivity as a 6th covariate, as an indicator of soil depth and landscape productivity which is less sensitive to local pollution than  total phosphorus.
 The set of available environmental data is assembled from various sources, including maps and other georeferenced data (altitude, position, climate), field measurements from the sampling (Secchi depth, CTD casts), as well as chemical analyses on collected water samples
 
@@ -35,15 +35,15 @@ lake.sp <- SpatialPointsDataFrame(lake[, c("Longitude", "Latitude")], lake, proj
 tmean <- getData('worldclim', var='tmean', res=2.5)
 ```
 
-The data are mean monthly temperatures over the period 1960 to 1990. We can for example look at the July temperature raster with sampling locations overlaid (notice that units are 10 * degrees C):
+The data are mean monthly temperatures over the period 1960 to 1990. We can for example look at the July temperature raster with sampling locations overlaid:
 
-```{r, echo=FALSE, fig.align="center", fig.cap="Fig. S1.1 Mean July temperature (x 10) with sampled lake locations indicated"}
+```{r, echo=FALSE, fig.align="center", fig.cap="Fig. S1.1 Mean July temperature with sampled lake locations indicated"}
 
 scand <- as(extent(4.5, 19.5, 57, 64), 'SpatialPolygons')
 crs(scand) <- crs(tmean)
 tmean.scand <- crop(tmean, scand) # Crop to S. Scandinavia
 
-plot(tmean.scand[[7]])
+plot(tmean.scand[[7]] / 10)
 points(coordinates(lake.sp))
 ```
 
@@ -101,7 +101,7 @@ q$Legend <- c("Latitude", "Longitude", "Altitude (m)", "Surface area (km2)",
             "Annual mean temperature (C, Worldclim)", "Mean July temperature (C, Worldclim)",
             "Secchi depth (m)", "Water temperature (C, CTD)", "Chlorophyll (in vivo, CTD)",
             "Specific conductivity (mS/m)", "pH", "Total organic C (mg/L)", "Total N (mg/L)",
-            "Total P (µg/L)", "Silicate (mg/L")
+            "Total P (?g/L)", "Silicate (mg/L")
 
 knitr::kable(q, digits=2, caption="Table S1.1. Summary statistics of 15 relevant spatial, climatic, and environmental covariates (1st, 2nd (= median), 3rd quartiles, and maxima)")
 ```
@@ -189,7 +189,15 @@ env.z <- as.data.frame(scale(env[, -(1:3)]))
 rownames(env.z) <-  env$ID
 
 pca <- rda(env.z[, main.vars])
-(efit <- envfit(pca, env.z[, aux.vars]))
+efit <- envfit(pca, env.z[, aux.vars])
+
+```
+```{r echo=FALSE}
+
+fit.table <- with(efit$vector, data.frame(arrows, r, pvals))
+names(fit.table) <- c("PC1", "PC2", "R2", "p")
+knitr::kable(fit.table, caption="Table S1.3. Regression coefficients of auxiliary covariates on principal component ordination axes (PC1 and PC2). R2 is the fraction of variance explained, while p is 999 permutation-based significance probability")
+
 ```
 
 In other words, all covariates except log(area) are significantly correlated with the PC ordination axes defined by the 6 main variables:
