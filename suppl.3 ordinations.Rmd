@@ -1,5 +1,5 @@
 ---
-title: "Suppl. 3 ordinations"
+title: "Supplementary information 3: Phytoplankton, zooplankton, and fish ordinations"
 author: "Tom Andersen"
 date: "2 april 2019"
 output: html_document
