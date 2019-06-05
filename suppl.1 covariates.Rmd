@@ -1,7 +1,5 @@
 ---
 title: "Supplementary information 1: Selection of covariates"
-author: "Tom Andersen"
-date: "13 februar 2019"
 output: html_document
 ---
 
